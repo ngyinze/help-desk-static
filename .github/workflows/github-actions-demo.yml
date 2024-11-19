@@ -1,1 +1,40 @@
+name: Deploy Guides
 
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  deploy-guides:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install required tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jq openssh-client
+
+    - name: Calculate SHA256 for *.webp files
+      run: |
+        mkdir -p hashed-files
+        for file in $(find . -name "*.webp"); do
+          sha=$(sha256sum "$file" | awk '{print $1}')
+          cp "$file" "hashed-files/$sha.webp"
+        done
+
+    - name: Upload files via SCP
+      env:
+        SCP_TARGET: ${{ secrets.SCP_TARGET }}
+        SCP_USER: ${{ secrets.SCP_USER }}
+        SCP_PRIVATE_KEY: ${{ secrets.SCP_PRIVATE_KEY }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SCP_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        scp -i ~/.ssh/id_rsa hashed-files/* "$SCP_USER@$SCP_TARGET:/path/to/destination"
+
+    - name: Clean up
+      run: rm -rf hashed-files
