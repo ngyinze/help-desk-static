@@ -31,7 +31,7 @@ jobs:
         SCP_USER: ${{ secrets.SCP_USER }}
         SCP_PRIVATE_KEY: ${{ secrets.SCP_PRIVATE_KEY }}
       run: |
-        echo SCP_TARGET 
+        echo $SCP_TARGET 
         mkdir -p ~/.ssh
         echo "$SCP_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
