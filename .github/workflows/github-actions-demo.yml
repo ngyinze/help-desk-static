@@ -2,8 +2,8 @@ name: Deploy Guides
 
 on:
   push:
-    tags:
-      - "*"
+    branches:
+      - 'main'
 
 jobs:
   deploy-guides:
