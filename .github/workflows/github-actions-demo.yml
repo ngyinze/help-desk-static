@@ -34,7 +34,7 @@ jobs:
         mkdir -p ~/.ssh
         echo "$SCP_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        scp -i ~/.ssh/id_rsa hashed-files/* "$SCP_USER@$SCP_TARGET:/path/to/destination"
+        scp -i ~/.ssh/id_rsa hashed-files/* "$SCP_USER@$SCP_TARGET:/home/azureuser/static/"
 
     - name: Clean up
       run: rm -rf hashed-files
