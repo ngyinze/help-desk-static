@@ -160,7 +160,7 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          tag_name=$(echo "${GITHUB_REF##*/}")
+          tag_name="v${{ steps.getversion.outputs.version }}"
           tree
           git add output.json
           git commit -m "Add JSON file with tag data" || echo "No changes to commit"
