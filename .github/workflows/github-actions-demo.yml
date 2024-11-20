@@ -67,7 +67,7 @@ jobs:
             echo "        \"content\": [" >> $output_json
 
             # Process .webp files inside the topic
-            files=$(find "$topic_path" *.webp)
+            files=$(find "$topic_path" -type f -name "*.webp")
             for file in $files; do
               sha=$(sha256sum "$file" | awk '{print $1}')
               filename=$(basename "$file" .webp)
