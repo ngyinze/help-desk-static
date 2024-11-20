@@ -1,0 +1,24 @@
+name: Tag Versioning
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Read VERSION
+        id: read_version
+        run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ steps.getversion.outputs.version }}" -m "Tagging version v${{ steps.getversion.outputs.version }}"
+          git push origin "v${{ steps.getversion.outputs.version }}"
