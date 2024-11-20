@@ -75,6 +75,7 @@ jobs:
 
               echo "          {" >> $output_json
               echo "            \"name\": \"$sequence $content_name\"," >> $output_json
+              echo "content_name"
               echo "$content_name"
               echo "            \"component\": \"$component\"," >> $output_json
               echo "$component"
