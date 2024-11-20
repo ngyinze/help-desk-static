@@ -1,11 +1,6 @@
 [
   {
-    "interface": "hashed-files",
-    "topic": [
-    ]
-  },
-  {
-    "interface": "formsl_iv",
+    "interface": "_formsl_iv",
     "topic": [
       {
         "name": "test",
@@ -16,60 +11,17 @@
         "name": "create invoice",
         "content": [
           {
-            "name": "SelectCustomer",
-            "component": "cxDBCombobox1",
-            "object": "547dfb41a757b49f89d189cb8843d690b6ec274bc5ee83c8ebf056cbe2900158"
+            "sequence": "2",
+            "name": "Step 2 InsertDetails_LabeledEdit1",
+            "component": "",
+            "object": "8b5641e8d891f023f2a154c64faa09e5c2af99aa626617c64ca532ea4ab50b57"
           },
           {
-            "name": "InsertDetails",
-            "component": "LabeledEdit1",
-            "object": "8b5641e8d891f023f2a154c64faa09e5c2af99aa626617c64ca532ea4ab50b57"
+            "sequence": "1",
+            "name": "Step 1 Select Customer_cxDBCombobox1",
+            "component": "",
+            "object": "547dfb41a757b49f89d189cb8843d690b6ec274bc5ee83c8ebf056cbe2900158"
           }
-        ]
-      }
-    ]
-  },
-  {
-    "interface": ".github",
-    "topic": [
-      {
-        "name": "workflows",
-        "content": [
-        ]
-      }
-    ]
-  },
-  {
-    "interface": ".git",
-    "topic": [
-      {
-        "name": "info",
-        "content": [
-        ]
-      },
-      {
-        "name": "branches",
-        "content": [
-        ]
-      },
-      {
-        "name": "refs",
-        "content": [
-        ]
-      },
-      {
-        "name": "logs",
-        "content": [
-        ]
-      },
-      {
-        "name": "objects",
-        "content": [
-        ]
-      },
-      {
-        "name": "hooks",
-        "content": [
         ]
       }
     ]
