@@ -40,7 +40,6 @@ jobs:
 
     - name: Generate JSON from .webp files
       run: |
-        mkdir -p hashed-files
         output_json="output.json"
         echo "[" > $output_json
 
