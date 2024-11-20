@@ -2,8 +2,9 @@ name: Deploy Guides
 
 on:
   push:
-    branches:
-      - 'main'
+    tags:
+      '**.webp'
+
 
 jobs:
   deploy-guides:
