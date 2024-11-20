@@ -8,6 +8,8 @@ on:
 jobs:
   create-tag:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Ensure write access to the repository's contents
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
