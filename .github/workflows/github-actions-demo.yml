@@ -1,7 +1,7 @@
 name: Deploy Guides
 
 on:
-  create:
+  push:
     tags:
       '**'
 
