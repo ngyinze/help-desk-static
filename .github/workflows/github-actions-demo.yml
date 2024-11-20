@@ -43,10 +43,11 @@ jobs:
         touch $output.json
         output_json="output.json"
         echo "[" > $output_json
+        echo "$output_json" 
 
         # List only first-level directories
         interfaces=$(find . -mindepth 1 -maxdepth 1 -type d | sed 's|./||g')
-
+        echo "$output_json" 
         for interface_path in $interfaces; do
           interface_name=$(echo "$interface_path" | awk '{print tolower($0)}') # Convert to lowercase
           echo "  {" >> $output_json
