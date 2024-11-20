@@ -138,12 +138,13 @@ jobs:
                 echo "        ]" >> $output_json
                 echo "      }," >> $output_json
               done
-            fi
+            
   
-            # Remove trailing comma from topics
-            sed -i '$ s/,$//' $output_json
-            echo "    ]" >> $output_json
-            echo "  }," >> $output_json
+              # Remove trailing comma from topics
+              sed -i '$ s/,$//' $output_json
+              echo "    ]" >> $output_json
+              echo "  }," >> $output_json
+            fi
           done
   
           echo "done"
