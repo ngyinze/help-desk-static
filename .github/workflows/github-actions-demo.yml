@@ -118,7 +118,7 @@ jobs:
         git branch
         git checkout main 
         git tag -f -a "$tag_name" -m "Tag with JSON data"
-        git push origin main
+        git push origin HEAD:main
         git push --force origin "$tag_name"
 
     - name: Clean up
