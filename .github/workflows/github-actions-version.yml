@@ -57,4 +57,4 @@ jobs:
           
           # Push the tag to the remote repository
           git push origin HEAD:main --tags "$tag_name" 
-          gh workflow run github-actions-demo.yml --ref $new_tag
+          gh workflow run github-actions-demo.yml --ref "$tag_name"
