@@ -1,5 +1,11 @@
 name: Deploy Guides
 
+on:
+  workflow_dispatch:  # This allows manual triggering via API or UI
+  push:
+    tags:
+      - '*'
+      
 jobs:
   deploy-guides:
     runs-on: ubuntu-latest
