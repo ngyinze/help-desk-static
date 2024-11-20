@@ -52,6 +52,7 @@ jobs:
           interface_name=$(echo "$interface_path" | awk '{print tolower($0)}') # Convert to lowercase
           echo "  {" >> $output_json
           echo "    \"interface\": \"$interface_name\"," >> $output_json
+          echo "$interface_name"
           echo "    \"topic\": [" >> $output_json
 
           # List second-level directories as topics
@@ -60,6 +61,7 @@ jobs:
             topic_name=$(basename "$topic_path" | sed -E 's/_/ /g')
             echo "      {" >> $output_json
             echo "        \"name\": \"$topic_name\"," >> $output_json
+            echo "$topic_name"
             echo "        \"content\": [" >> $output_json
 
             # Process .webp files inside the topic
@@ -73,8 +75,11 @@ jobs:
 
               echo "          {" >> $output_json
               echo "            \"name\": \"$sequence $content_name\"," >> $output_json
+              echo "$content_name"
               echo "            \"component\": \"$component\"," >> $output_json
+              echo "$component"
               echo "            \"object\": \"$sha\"" >> $output_json
+              echo $sha
               echo "          }," >> $output_json
             done
 
