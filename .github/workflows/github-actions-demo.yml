@@ -116,7 +116,7 @@ jobs:
         git commit -m "Add JSON file with tag data" 
         # Create the tag pointing to the current commit
         git tag -f -a "$tag_name" -m "Tag with JSON data"
-        git push origin HEAD
+        git push origin main
         git push --force origin "$tag_name"
 
     - name: Clean up
