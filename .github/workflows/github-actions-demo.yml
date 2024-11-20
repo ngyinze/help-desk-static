@@ -52,44 +52,44 @@ jobs:
         echo "$output_json" 
         for interface_path in $interfaces; do
           interface_name=$(echo "$interface_path" | awk '{print tolower($0)}') # Convert to lowercase
-          echo "  {" >> $output_json
-          echo "    \"interface\": \"$interface_name\"," >> $output_json
-          echo "$interface_name"
-          echo "    \"topic\": [" >> $output_json
-
-          # List second-level directories as topics
-          topics=$(find "$interface_path" -mindepth 1 -maxdepth 1 -type d)
-          for topic_path in $topics; do
-            topic_name=$(basename "$topic_path" | sed -E 's/_/ /g')
-            echo "      {" >> $output_json
-            echo "        \"name\": \"$topic_name\"," >> $output_json
-            echo "$topic_name"
-            echo "        \"content\": [" >> $output_json
-
-            # Process .webp files inside the topic
-            files=$(find "$topic_path" -type f -name "*.webp")
-            for file in $files; do
-              sha=$(sha256sum "$file" | awk '{print $1}')
-              filename=$(basename "$file" .webp)
-              content_name=$(echo "$filename" | sed 's/^[^-]*-\([^-]*\)-.*$/\1/' | xargs)
-              component=$(echo "$filename" | cut -d'_' -f3-)
-
-              echo "          {" >> $output_json
-              echo "            \"name\": \"$content_name\"," >> $output_json
-              echo "content_name"
-              echo "$content_name"
-              echo "            \"component\": \"$component\"," >> $output_json
-              echo "$component"
-              echo "            \"object\": \"$sha\"" >> $output_json
-              echo "$sha"
-              echo "          }," >> $output_json
+          if [[ "$interface_name" == _* ]]; then
+            echo "  {" >> $output_json
+            echo "    \"interface\": \"$interface_name\"," >> $output_json
+            echo "$interface_name"
+            echo "    \"topic\": [" >> $output_json
+          
+            topics=$(find "$interface_path" -mindepth 1 -maxdepth 1 -type d)
+            for topic_path in $topics; do
+              topic_name=$(basename "$topic_path" | sed -E 's/_/ /g')
+              echo "      {" >> $output_json
+              echo "        \"name\": \"$topic_name\"," >> $output_json
+              echo "$topic_name"
+              echo "        \"content\": [" >> $output_json
+              
+              files=$(find "$topic_path" -type f -name "*.webp")
+              for file in $files; do
+                sha=$(sha256sum "$file" | awk '{print $1}')
+                filename=$(basename "$file" .webp)
+                content_name=$(echo "$filename" | sed 's/^[^-]*-\([^-]*\)-.*$/\1/' | xargs)
+                component=$(echo "$filename" | cut -d'_' -f3-)
+                
+                echo "          {" >> $output_json
+                echo "            \"name\": \"$content_name\"," >> $output_json
+                echo "content_name"
+                echo "$content_name"
+                echo "            \"component\": \"$component\"," >> $output_json
+                echo "$component"
+                echo "            \"object\": \"$sha\"" >> $output_json
+                echo "$sha"
+                echo "          }," >> $output_json
+              done
+              
+              # Remove trailing comma from content
+              sed -i '$ s/,$//' $output_json
+              echo "        ]" >> $output_json
+              echo "      }," >> $output_json
             done
-
-            # Remove trailing comma from content
-            sed -i '$ s/,$//' $output_json
-            echo "        ]" >> $output_json
-            echo "      }," >> $output_json
-          done
+          fi
 
           # Remove trailing comma from topics
           sed -i '$ s/,$//' $output_json
@@ -118,6 +118,6 @@ jobs:
         git tag -f -a "$tag_name" -m "Tag with JSON data"
         git push origin HEAD:main
         git push --force origin "$tag_name"
-
+        
     - name: Clean up
       run: rm -rf hashed-files output.json
