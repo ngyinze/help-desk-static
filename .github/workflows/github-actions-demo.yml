@@ -40,7 +40,7 @@ jobs:
 
     - name: Generate JSON from .webp files
       run: |
-        touch output.json
+        touch $output.json
         output_json="output.json"
         echo "[" > $output_json
 
