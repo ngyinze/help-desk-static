@@ -45,6 +45,8 @@ jobs:
             echo "Tag $tag_name exists, updating it."
             # Delete the existing tag
             git tag -d "$tag_name"
+             # Delete the existing remote tag
+            git push --delete origin "$tag_name"
             # Create the tag again
             git tag -a "$tag_name" -m "Updating tag for version $tag_name"
           else
