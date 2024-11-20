@@ -172,7 +172,7 @@ jobs:
             git push --delete origin "$tag_name"
           fi
           git tag -a "$tag_name" -m "Tag with JSON data"
-          git push origin "$tag_name"
+          git push origin HEAD:main --tags "$tag_name"
           
       - name: Clean up
         run: rm -rf hashed-files output.json
