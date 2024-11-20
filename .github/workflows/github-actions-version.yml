@@ -54,4 +54,4 @@ jobs:
           fi
           
           # Push the tag to the remote repository
-          git push origin "$tag_name" --force  # Use --force to overwrite if updating the tag
+          git push origin "$tag_name" 
