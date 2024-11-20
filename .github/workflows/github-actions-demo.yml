@@ -1,10 +1,5 @@
 name: Deploy Guides
 
-on:
-  push:
-    tags:
-      '*'
-
 jobs:
   deploy-guides:
     runs-on: ubuntu-latest
