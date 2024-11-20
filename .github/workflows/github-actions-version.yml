@@ -10,48 +10,121 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write  # Ensure write access to the repository's contents
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install yq
+      - name: Install required tools
         run: |
           sudo add-apt-repository ppa:rmescandon/yq
           sudo apt update
           sudo apt install yq -y
-      
+
       - name: Read VERSION file and extract version
         id: getversion
         run: |
-          # Extract the version value from the YAML file
           version=$(yq eval '.version' VERSION.yaml)
           echo "version=${version}" >> $GITHUB_OUTPUT
           echo "Extracted version: $version"
 
-      # Check if the tag exists, and create or update the tag accordingly
-      - name: Create or update Git tag
+      - name: Handle Git Tag (Create or Update)
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag_name="v${{ steps.getversion.outputs.version }}"
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+          # Fetch the latest tags and handle creation or update
+          git fetch --tags
+
+          # If the tag exists, delete it and recreate; otherwise, create it
+          if git rev-parse "$tag_name" >/dev/null 2>&1; then
+            echo "Tag $tag_name exists. Updating it."
+            git tag -d "$tag_name"
+            git push --delete origin "$tag_name"
+          else
+            echo "Tag $tag_name does not exist. Creating a new one."
+          fi
+
+      - name: Calculate SHA256 for *.webp files
+        run: |
+          mkdir -p hashed-files
+          for file in $(find . -name "*.webp"); do
+            sha=$(sha256sum "$file" | awk '{print $1}')
+            cp "$file" "hashed-files/$sha.webp"
+          done
+
+      - name: Generate JSON from .webp files
+        run: |
+          output_json="output.json"
+          echo "[" > $output_json
+
+          # Generate JSON data for each directory and file
+          for interface_path in $(find . -mindepth 1 -maxdepth 1 -type d); do
+            interface_name=$(basename "$interface_path" | awk '{print tolower($0)}')
+            if [[ "$interface_name" == _* ]]; then
+              echo "  {" >> $output_json
+              echo "    \"interface\": \"$interface_name\"," >> $output_json
+              echo "    \"topic\": [" >> $output_json
+
+              for topic_path in $(find "$interface_path" -mindepth 1 -maxdepth 1 -type d); do
+                topic_name=$(basename "$topic_path" | sed -E 's/_/ /g')
+                echo "      {" >> $output_json
+                echo "        \"name\": \"$topic_name\"," >> $output_json
+                echo "        \"content\": [" >> $output_json
+
+                for file in $(find "$topic_path" -type f -name "*.webp"); do
+                  sha=$(sha256sum "$file" | awk '{print $1}')
+                  filename=$(basename "$file" .webp)
+                  sequence =$(echo "$filename" | cut -d'_' -f1) 
+                  content_name=$(echo "$filename" | sed 's/^[^_]*_\([^_]*\)/\1/' | sed 's/\./ /g' | xargs)
+                  component=$(echo "$filename" | cut -d'_' -f4-)
+
+                  echo "          {" >> $output_json
+                  echo "            \"sequence\": \"$sequence\"," >> $output_json
+                  echo "            \"name\": \"$content_name\"," >> $output_json
+                  echo "            \"component\": \"$component\"," >> $output_json
+                  echo "            \"object\": \"$sha\"" >> $output_json
+                  echo "          }," >> $output_json
+                done
+
+                # Remove trailing comma and close content array
+                sed -i '$ s/,$//' $output_json
+                echo "        ]" >> $output_json
+                echo "      }," >> $output_json
+              done
+
+              # Remove trailing comma and close topics array
+              sed -i '$ s/,$//' $output_json
+              echo "    ]" >> $output_json
+              echo "  }," >> $output_json
+            fi
+          done
+
+          # Remove trailing comma and close interfaces array
+          sed -i '$ s/,$//' $output_json
+          echo "]" >> $output_json
+
+          cat $output_json
+
+      - name: Embed JSON in the Git Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           tag_name="v${{ steps.getversion.outputs.version }}"
-          
-          # Fetch the latest tags from the remote
-          git fetch --tags
-          
-          # Check if the tag already exists
-          if git rev-parse "$tag_name" >/dev/null 2>&1; then
-            echo "Tag $tag_name exists, updating it."
-            # Delete the existing tag
-            git tag -d "$tag_name"
-            # Create the tag again
-            git tag -a "$tag_name" -m "Updating tag for version $tag_name"
-          else
-            echo "Tag $tag_name does not exist, creating a new one."
-            # Create a new tag
-            git tag -a "$tag_name" -m "Tagging version $tag_name"
-          fi
-          
-          # Push the tag to the remote repository
-          git push origin "$tag_name" --force  # Use --force to overwrite if updating the tag
+
+          # Stage and commit the output.json file
+          git add output.json
+          git commit -m "Add JSON file with tag data" || echo "No changes to commit"
+
+          # Push the changes to the main branch and tag
+          git push origin HEAD:main
+          git tag -a "$tag_name" -m "Tag with JSON data"
+          git push origin "$tag_name"
+
+      - name: Clean up
+        run: rm -rf hashed-files output.json
