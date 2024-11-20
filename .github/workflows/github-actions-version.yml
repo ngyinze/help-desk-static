@@ -28,11 +28,30 @@ jobs:
           echo "version=${version}" >> $GITHUB_OUTPUT
           echo "Extracted version: $version"
 
-      - name: Create Git tag
+      # Check if the tag exists, and create or update the tag accordingly
+      - name: Create or update Git tag
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git tag -a "v${{ steps.getversion.outputs.version }}" -m "Tagging version v${{ steps.getversion.outputs.version }}"
-          git push origin "v${{ steps.getversion.outputs.version }}"
+          tag_name="v${{ steps.getversion.outputs.version }}"
+          
+          # Fetch the latest tags from the remote
+          git fetch --tags
+          
+          # Check if the tag already exists
+          if git rev-parse "$tag_name" >/dev/null 2>&1; then
+            echo "Tag $tag_name exists, updating it."
+            # Delete the existing tag
+            git tag -d "$tag_name"
+            # Create the tag again
+            git tag -a "$tag_name" -m "Updating tag for version $tag_name"
+          else
+            echo "Tag $tag_name does not exist, creating a new one."
+            # Create a new tag
+            git tag -a "$tag_name" -m "Tagging version $tag_name"
+          fi
+          
+          # Push the tag to the remote repository
+          git push origin "$tag_name" --force  # Use --force to overwrite if updating the tag
