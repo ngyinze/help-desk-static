@@ -163,11 +163,16 @@ jobs:
           tag_name=$(echo "${GITHUB_REF##*/}")
           tree
           git add output.json
-          git commit -m "Add JSON file with tag data" 
+          git commit -m "Add JSON file with tag data" || echo "No changes to commit"
           git push origin HEAD:main
           # Create the tag pointing to the current commit
-          # git tag -f -a "$tag_name" -m "Tag with JSON data"
-          # git push --force origin "$tag_name"
+          if git rev-parse "$tag_name" >/dev/null 2>&1; then
+            echo "Tag $tag_name exists. Updating it."
+            git tag -d "$tag_name"
+            git push --delete origin "$tag_name"
+          fi
+          git tag -a "$tag_name" -m "Tag with JSON data"
+          git push origin "$tag_name"
           
       - name: Clean up
         run: rm -rf hashed-files output.json
