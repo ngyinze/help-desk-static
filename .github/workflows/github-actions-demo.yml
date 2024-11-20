@@ -3,7 +3,7 @@ name: Deploy Guides
 on:
   push:
     tags:
-      '**.webp'
+      '**'
 
 jobs:
   deploy-guides:
