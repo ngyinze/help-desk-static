@@ -79,8 +79,8 @@ jobs:
                   sha=$(sha256sum "$file" | awk '{print $1}')
                   filename=$(basename "$file" .webp)
                   sequence_id=$(echo "$filename" | cut -d'_' -f1) 
-                  content_name=$(echo "$filename" | sed 's/^[^_]*_\([^_]*\)/\1/' | sed 's/\./ /g' | xargs)
-                  component=$(echo "$filename" | cut -d'_' -f4-)
+                  content_name=$(echo "$filename" | sed 's/^[^_]*_\([^_]*\)-.*/\1/' | sed 's/\./ /g' | xargs)
+                  component=$(echo "$filename" | cut -d'_' -f3-)
 
                   echo "          {" >> $output_json
                   echo "            \"sequence\": \"$sequence_id\"," >> $output_json
