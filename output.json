@@ -20,6 +20,11 @@
             "object": "547dfb41a757b49f89d189cb8843d690b6ec274bc5ee83c8ebf056cbe2900158"
           },
           {
+            "name": "Step3_AddNewItemRecord_cxButton2",
+            "component": "cxButton2",
+            "object": "0cf55d904f7528c9ecdeafb9dbb711b738873e596d31e6b205181965b8a50f69"
+          },
+          {
             "name": "Step2_InsertDetails_LabeledEdit1",
             "component": "LabeledEdit1",
             "object": "8b5641e8d891f023f2a154c64faa09e5c2af99aa626617c64ca532ea4ab50b57"
