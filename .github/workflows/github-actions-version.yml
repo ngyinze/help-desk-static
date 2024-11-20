@@ -56,4 +56,4 @@ jobs:
           fi
           
           # Push the tag to the remote repository
-          git push origin --tags "$tag_name" 
+          git push origin HEAD:main --tags "$tag_name" 
