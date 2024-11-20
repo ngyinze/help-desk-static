@@ -63,8 +63,9 @@ jobs:
 
           # Generate JSON data for each directory and file
           for interface_path in $(find . -mindepth 1 -maxdepth 1 -type d); do
-            interface_name=$(basename "$interface_path" | sed 's/^_//')
+            interface_name=$(basename "$interface_path")
             if [[ "$interface_name" == _* ]]; then
+              interface_name=$(echo "$interface_name" | sed 's/^_//')
               echo "  {" >> $output_json
               echo "    \"interface\": \"$interface_name\"," >> $output_json
               echo "    \"topic\": [" >> $output_json
