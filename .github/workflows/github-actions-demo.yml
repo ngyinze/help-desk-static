@@ -5,7 +5,6 @@ on:
     tags:
       '**.webp'
 
-
 jobs:
   deploy-guides:
     runs-on: ubuntu-latest
@@ -16,28 +15,71 @@ jobs:
     - name: Install required tools
       run: |
         sudo apt-get update
-        sudo apt-get install -y jq openssh-client
+        sudo apt-get install -y jq
 
-    - name: Calculate SHA256 for *.webp files
+    - name: Generate JSON from .webp files
       run: |
         mkdir -p hashed-files
-        for file in $(find . -name "*.webp"); do
-          sha=$(sha256sum "$file" | awk '{print $1}')
-          cp "$file" "hashed-files/$sha.webp"
+        output_json="output.json"
+        echo "[" > $output_json
+        interfaces=$(find . -type d -name "FormSL_*" | sed 's|./||g')
+
+        for interface_path in $interfaces; do
+          interface_name=$(echo "$interface_path" | sed -E 's/FormSL_//g' | awk '{print tolower($0)}')
+          echo "  {" >> $output_json
+          echo "    \"interface\": \"$interface_name\"," >> $output_json
+          echo "    \"topic\": [" >> $output_json
+
+          topics=$(find $interface_path -type d -mindepth 1 -maxdepth 1)
+          for topic_path in $topics; do
+            topic_name=$(basename "$topic_path" | sed -E 's/_/ /g')
+            echo "      {" >> $output_json
+            echo "        \"name\": \"$topic_name\"," >> $output_json
+            echo "        \"content\": [" >> $output_json
+
+            files=$(find "$topic_path" -type f -name "*.webp")
+            for file in $files; do
+              sha=$(sha256sum "$file" | awk '{print $1}')
+              filename=$(basename "$file" .webp)
+              sequence=$(echo "$filename" | cut -d'_' -f1)
+              content_name=$(echo "$filename" | cut -d'_' -f2- | sed -E 's/(cx[a-zA-Z0-9]+)//g' | sed 's/_/ /g' | xargs)
+              component=$(echo "$filename" | grep -oE 'cx[a-zA-Z0-9]+')
+
+              echo "          {" >> $output_json
+              echo "            \"name\": \"$sequence $content_name\"," >> $output_json
+              echo "            \"component\": \"$component\"," >> $output_json
+              echo "            \"object\": \"$sha\"" >> $output_json
+              echo "          }," >> $output_json
+            done
+
+            # Remove trailing comma from content
+            sed -i '$ s/,$//' $output_json
+            echo "        ]" >> $output_json
+            echo "      }," >> $output_json
+          done
+
+          # Remove trailing comma from topic
+          sed -i '$ s/,$//' $output_json
+          echo "    ]" >> $output_json
+          echo "  }," >> $output_json
         done
 
-    - name: Upload files via SCP
+        # Remove trailing comma from interfaces
+        sed -i '$ s/,$//' $output_json
+        echo "]" >> $output_json
+
+        cat $output_json
+
+    - name: Embed JSON in the Git Tag
       env:
-        SCP_TARGET: ${{ secrets.SCP_TARGET }}
-        SCP_USER: ${{ secrets.SCP_USER }}
-        SCP_PRIVATE_KEY: ${{ secrets.SCP_PRIVATE_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        echo "$SCP_TARGET" 
-        mkdir -p ~/.ssh
-        echo "$SCP_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        echo "StrictHostKeyChecking=no" >> ~/.ssh/config
-        scp -i ~/.ssh/id_rsa hashed-files/* "$SCP_USER@$SCP_TARGET:/home/azureuser/static/"
+        tag_name=$(echo "${GITHUB_REF##*/}")
+        tag_message=$(cat output.json | jq -c .) # Convert JSON to single-line format
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git tag -f -a "$tag_name" -m "$tag_message"
+        git push --force origin "$tag_name"
 
     - name: Clean up
-      run: rm -rf hashed-files
+      run: rm -rf hashed-files output.json
