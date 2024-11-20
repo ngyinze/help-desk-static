@@ -8,13 +8,15 @@ on:
 jobs:
   create-tag:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Ensure write access to the repository's contents
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
       - name: Read VERSION
         id: read_version
-        run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+        run: echo "version=$(cat VERSION.yaml)" >> $GITHUB_OUTPUT
 
       - name: Create Git tag
         env:
