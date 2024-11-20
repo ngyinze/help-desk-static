@@ -1,11 +1,10 @@
 [
-  {
-    "interface": "hashed-files",
-    "topic": [
+    ]
+  }
     ]
   },
   {
-    "interface": "formsl_iv",
+    "interface": "_formsl_iv",
     "topic": [
       {
         "name": "test",
@@ -16,62 +15,19 @@
         "name": "create invoice",
         "content": [
           {
-            "name": "SelectCustomer",
+            "name": "Step1_SelectCustomer_cxDBCombobox1",
             "component": "cxDBCombobox1",
             "object": "547dfb41a757b49f89d189cb8843d690b6ec274bc5ee83c8ebf056cbe2900158"
           },
           {
-            "name": "InsertDetails",
+            "name": "Step2_InsertDetails_LabeledEdit1",
             "component": "LabeledEdit1",
             "object": "8b5641e8d891f023f2a154c64faa09e5c2af99aa626617c64ca532ea4ab50b57"
           }
         ]
       }
     ]
-  },
-  {
-    "interface": ".github",
-    "topic": [
-      {
-        "name": "workflows",
-        "content": [
-        ]
-      }
-    ]
-  },
-  {
-    "interface": ".git",
-    "topic": [
-      {
-        "name": "info",
-        "content": [
-        ]
-      },
-      {
-        "name": "branches",
-        "content": [
-        ]
-      },
-      {
-        "name": "refs",
-        "content": [
-        ]
-      },
-      {
-        "name": "logs",
-        "content": [
-        ]
-      },
-      {
-        "name": "objects",
-        "content": [
-        ]
-      },
-      {
-        "name": "hooks",
-        "content": [
-        ]
-      }
+  }
     ]
   }
 ]
