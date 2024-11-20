@@ -63,7 +63,7 @@ jobs:
 
           # Generate JSON data for each directory and file
           for interface_path in $(find . -mindepth 1 -maxdepth 1 -type d); do
-            interface_name=$(basename "$interface_path" | awk '{print tolower($0)}')
+            interface_name=$(basename "$interface_path" | sed 's/^_//')
             if [[ "$interface_name" == _* ]]; then
               echo "  {" >> $output_json
               echo "    \"interface\": \"$interface_name\"," >> $output_json
@@ -75,9 +75,10 @@ jobs:
                 echo "        \"name\": \"$topic_name\"," >> $output_json
                 echo "        \"content\": [" >> $output_json
 
-                for file in $(find "$topic_path" -type f -name "*.webp"); do
+                for file in $(find "$topic_path" -type f); do
                   sha=$(sha256sum "$file" | awk '{print $1}')
-                  filename=$(basename "$file" .webp)
+                  extension=$(basename "$file" | sed 's/.*\(\.[^.]*\)$/\1/')
+                  filename=$(basename "$file" "$extension")
                   sequence_id=$(echo "$filename" | cut -d'_' -f1) 
                   content_name=$(echo "$filename" | sed 's/^[^_]*_\([^_]*\).*$/\1/' | sed 's/\./ /g' | xargs)
                   component=$(echo "$filename" | cut -d'_' -f3-)
@@ -86,7 +87,7 @@ jobs:
                   echo "            \"sequence\": \"$sequence_id\"," >> $output_json
                   echo "            \"name\": \"$content_name\"," >> $output_json
                   echo "            \"component\": \"$component\"," >> $output_json
-                  echo "            \"object\": \"$sha\"" >> $output_json
+                  echo "             \"object\": \"$sha$extension\"" >> $output_json
                   echo "          }," >> $output_json
                 done
 
