@@ -71,8 +71,8 @@ jobs:
             for file in $files; do
               sha=$(sha256sum "$file" | awk '{print $1}')
               filename=$(basename "$file" .webp)
-              content_name=$(echo "$filename" | cut -d'_' -f3 | sed 's/_/ /g' | xargs)
-              component=$(echo "$filename" | cut -d'_' -f4-)
+              content_name=$(echo "$filename" | sed 's/^[^-]*-\([^-]*\)-.*$/\1/' | xargs)
+              component=$(echo "$filename" | cut -d'_' -f3-)
 
               echo "          {" >> $output_json
               echo "            \"name\": \"$content_name\"," >> $output_json
