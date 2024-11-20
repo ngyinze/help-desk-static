@@ -17,26 +17,51 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y jq
 
+    - name: Calculate SHA256 for *.webp files
+      run: |
+        mkdir -p hashed-files
+        for file in $(find . -name "*.webp"); do
+          sha=$(sha256sum "$file" | awk '{print $1}')
+          cp "$file" "hashed-files/$sha.webp"
+        done
+
+    - name: Upload files via SCP
+      env:
+        SCP_TARGET: ${{ secrets.SCP_TARGET }}
+        SCP_USER: ${{ secrets.SCP_USER }}
+        SCP_PRIVATE_KEY: ${{ secrets.SCP_PRIVATE_KEY }}
+      run: |
+        echo "$SCP_TARGET" 
+        mkdir -p ~/.ssh
+        echo "$SCP_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        echo "StrictHostKeyChecking=no" >> ~/.ssh/config
+        scp -i ~/.ssh/id_rsa hashed-files/* "$SCP_USER@$SCP_TARGET:/home/azureuser/static/"
+
     - name: Generate JSON from .webp files
       run: |
         mkdir -p hashed-files
         output_json="output.json"
         echo "[" > $output_json
-        interfaces=$(find . -type d -name "FormSL_*" | sed 's|./||g')
+
+        # List only first-level directories
+        interfaces=$(find . -mindepth 1 -maxdepth 1 -type d | sed 's|./||g')
 
         for interface_path in $interfaces; do
-          interface_name=$(echo "$interface_path" | sed -E 's/FormSL_//g' | awk '{print tolower($0)}')
+          interface_name=$(echo "$interface_path" | awk '{print tolower($0)}') # Convert to lowercase
           echo "  {" >> $output_json
           echo "    \"interface\": \"$interface_name\"," >> $output_json
           echo "    \"topic\": [" >> $output_json
 
-          topics=$(find $interface_path -type d -mindepth 1 -maxdepth 1)
+          # List second-level directories as topics
+          topics=$(find "$interface_path" -mindepth 1 -maxdepth 1 -type d)
           for topic_path in $topics; do
             topic_name=$(basename "$topic_path" | sed -E 's/_/ /g')
             echo "      {" >> $output_json
             echo "        \"name\": \"$topic_name\"," >> $output_json
             echo "        \"content\": [" >> $output_json
 
+            # Process .webp files inside the topic
             files=$(find "$topic_path" -type f -name "*.webp")
             for file in $files; do
               sha=$(sha256sum "$file" | awk '{print $1}')
@@ -58,7 +83,7 @@ jobs:
             echo "      }," >> $output_json
           done
 
-          # Remove trailing comma from topic
+          # Remove trailing comma from topics
           sed -i '$ s/,$//' $output_json
           echo "    ]" >> $output_json
           echo "  }," >> $output_json
