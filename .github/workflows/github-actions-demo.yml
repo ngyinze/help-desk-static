@@ -79,7 +79,7 @@ jobs:
               echo "            \"component\": \"$component\"," >> $output_json
               echo "$component"
               echo "            \"object\": \"$sha\"" >> $output_json
-              echo $sha
+              echo "$sha"
               echo "          }," >> $output_json
             done
 
@@ -94,6 +94,8 @@ jobs:
           echo "    ]" >> $output_json
           echo "  }," >> $output_json
         done
+
+        echo "done"
 
         # Remove trailing comma from interfaces
         sed -i '$ s/,$//' $output_json
