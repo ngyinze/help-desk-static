@@ -13,10 +13,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install yq
+        run: sudo apt-get install -y yq
       
-      - name: Read VERSION
-        id: read_version
-        run: echo "version=$(cat VERSION.yaml)" >> $GITHUB_OUTPUT
+      - name: Read VERSION file and extract version
+        id: getversion
+        run: |
+          # Extract the version value from the YAML file
+          version=$(yq eval '.version' VERSION)
+          echo "version=${version}" >> $GITHUB_OUTPUT
+          echo "Extracted version: $version"
 
       - name: Create Git tag
         env:
