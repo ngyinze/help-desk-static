@@ -51,7 +51,7 @@ jobs:
       - name: Calculate SHA256 for *.webp files
         run: |
           mkdir -p hashed-files
-          find . -type f | while read -r file; do
+          find ./_*/ -maxdepth 1 -type f | while read -r file; do
             extension="${file##*.}"
             sha=$(sha256sum "$file" | awk '{print $1}')
             echo "Original File: $file"
