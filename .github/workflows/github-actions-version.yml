@@ -56,6 +56,19 @@ jobs:
             cp "$file" "hashed-files/$sha.webp"
           done
 
+      - name: Upload files via SCP
+        env:
+          SCP_TARGET: ${{ secrets.SCP_TARGET }}
+          SCP_USER: ${{ secrets.SCP_USER }}
+          SCP_PRIVATE_KEY: ${{ secrets.SCP_PRIVATE_KEY }}
+        run: |
+          echo "$SCP_TARGET" 
+          mkdir -p ~/.ssh
+          echo "$SCP_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "StrictHostKeyChecking=no" >> ~/.ssh/config
+          scp -i ~/.ssh/id_rsa hashed-files/* "$SCP_USER@$SCP_TARGET:/home/azureuser/static/"
+
       - name: Generate JSON from .webp files
         run: |
           output_json="output.json"
