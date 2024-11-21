@@ -51,9 +51,11 @@ jobs:
       - name: Calculate SHA256 for *.webp files
         run: |
           mkdir -p hashed-files
-          for file in $(find . -name "*.webp"); do
+          find . -type f | while read -r file; do
+            extension="${file##*.}"
             sha=$(sha256sum "$file" | awk '{print $1}')
-            cp "$file" "hashed-files/$sha.webp"
+            echo "Original File: $file"
+            cp "$file" "hashed-files/${sha}.${extension}"
           done
 
       - name: Upload files via SCP
