@@ -22,6 +22,12 @@
             "name": "Step2InsertDetails",
             "component": "LabeledEdit4",
              "object": "b8ad73d5b6ab35ac9816072032b7853d2f8775668150dc0eaecf62f6bc07cb22.mp4"
+          },
+          {
+            "sequence": "4",
+            "name": "Step4 Insert Details",
+            "component": "LabeledEdit3",
+             "object": "ac730aed0f53578368212b1f731019796878eb7038371aaf874ddad6cb86d4d4.mp4"
           }
         ]
       },
