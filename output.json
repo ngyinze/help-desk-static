@@ -70,6 +70,29 @@
              "object": "b8ad73d5b6ab35ac9816072032b7853d2f8775668150dc0eaecf62f6bc07cb22.mp4"
           }
         ]
+      },
+      {
+        "name": "new",
+        "content": [
+          {
+            "sequence": "2",
+            "name": "Step2InsertDetails",
+            "component": "LabeledEdit2",
+             "object": "caf2fe44f631b619b1c3d1f3617913e410b4bb41c2c86a39ff64aa6484229a74.mp4"
+          },
+          {
+            "sequence": "1",
+            "name": "Step1",
+            "component": "cxDBComboBox1",
+             "object": "6e0586a2d8e1631bb6d71761f9c05774a07481ca5d216607f0dba478e21a1214.pdf"
+          },
+          {
+            "sequence": "3",
+            "name": "Step2InsertDetails",
+            "component": "LabeledEdit4",
+             "object": "b8ad73d5b6ab35ac9816072032b7853d2f8775668150dc0eaecf62f6bc07cb22.mp4"
+          }
+        ]
       }
     ]
   }
